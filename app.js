@@ -66,7 +66,7 @@ app.use(
   })
 );
 //全局属性
-router.use(async (ctx, next) => {
+app.use(async (ctx, next) => {
   var pathname = url.parse(ctx.url).pathname;
    if (pathname === '/api/sys/login') {
       // 如果是登录直接放过
