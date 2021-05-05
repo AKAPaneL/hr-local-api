@@ -131,7 +131,7 @@ router.get('/user', async (ctx) => {
     inServiceStatus: item.inServiceStatus,
     departmentName: item.departmentName,
     level: item.level,
-    staffPhoto: item.staffPhoto
+    staffPhoto: item.staffPhoto || ''
    }))
     json.data = {
       total,
@@ -249,8 +249,8 @@ router.get("/user/:id", async (ctx, next) => {
   }
   const user = await UserModel.findById(id)
   if (user) {  
-    json.data = {
-      staffPhoto: user.staffPhoto,
+    json.data = { 
+      staffPhoto: user.staffPhoto || '',
       id: user._id,
       mobile: user.mobile,
       username: user.username,

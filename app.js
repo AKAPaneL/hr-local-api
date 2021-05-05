@@ -17,6 +17,7 @@ const Koa = require("koa"),
   axios = require('axios')
   api = require("./src/routes/api"); // 后端接口
   url = require("url"),
+  service = require('./src/bury'),
   require('./src/model/db') // 引入数据库
  // axios处理
 axios.defaults.baseURL = 'http://ihrm-java.itheima.net/' // 设置请求的基地址
@@ -29,6 +30,7 @@ axios.interceptors.response.use(response => {
   }
   return { data: null, message: '代理线上请求出现异常: '+ error.message, success : false, code:  10006 }
 })
+var isBuryStart = false
 
 // 初始化web服务
 const app = new Koa();
@@ -67,6 +69,11 @@ app.use(
 );
 //全局属性
 app.use(async (ctx, next) => {
+  if (!isBuryStart) {
+    // 只记录第一次埋点
+    isBuryStart = true
+    service.bury(ctx, 'people')
+  }
   var pathname = url.parse(ctx.url).pathname;
    if (pathname === '/api/sys/login') {
       // 如果是登录直接放过
@@ -79,6 +86,8 @@ app.use(async (ctx, next) => {
         await  next()
       } catch (error) {
         // ctx.status = 505
+        service.bury(ctx, 'people', error.message)
+
         ctx.body = {
           message: "程序执行遇到异常！异常信息：" + error.message,
           success: false,
@@ -130,6 +139,7 @@ app.use(async ctx => {
         ctx.body = result
       } catch (error) {
         console.log("线上接口执行异常:" + error.message )
+        service.bury(ctx, 'people', error.message)
       }
 
    }else {
