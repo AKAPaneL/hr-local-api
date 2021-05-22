@@ -297,7 +297,7 @@ router.put("/user/:id", async (ctx, next) => {
   let newUser = ctx.request.body
   const user = await UserModel.findById(id)
   if (user) {
-     if(newUser.mobile !== user.mobile) {
+     if(user.mobile && newUser.mobile !== user.mobile ) {
       json.success = false 
       json.message = '手机号不能修改'
      }
