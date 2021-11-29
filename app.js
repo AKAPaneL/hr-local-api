@@ -22,7 +22,7 @@ const Koa = require("koa"),
 
   const  { historyApiFallback } = require('koa2-connect-history-api-fallback');
   const proxy = require('koa2-proxy-middleware')
-
+  var process = require('child_process');
  // axios处理
 axios.defaults.baseURL = 'http://ihrm-java.itheima.net/' // 设置请求的基地址
 // axios响应拦截器
@@ -94,7 +94,7 @@ app.use(async (ctx, next) => {
     service.bury(ctx, 'people')
   }
   var pathname = url.parse(ctx.url).pathname;
-   if (pathname === '/api/sys/login') {
+   if (pathname === '/api/sys/login' || pathname === '/api/reset') {
       // 如果是登录直接放过
      await next()
    }else {
@@ -131,7 +131,17 @@ router.get('/',async ctx => {
   ctx.body = '黑马程序员-人力资源接口服务启动, 欢迎使用!!!';
 })
 router.use("/api", api);
+// 重置数据接口
+router.post('/api/reset', async (ctx) => {
+  await new Promise(resolve => setTimeout(() => resolve(), 5000))
+  process.exec(`node reset.js`, function (error, stdout, stderr) {
+    if (error) {
+      ctx.body = { "success": false, "code": 10000, "message": `重置数据失败, ${error.message}` }
+    }
+  })
+  ctx.body = { "success": true, "code": 10000, "message": "重置数据成功" }
 
+})
 app.use(router.routes())
 //启动路由
 app.use(router.allowedMethods());
