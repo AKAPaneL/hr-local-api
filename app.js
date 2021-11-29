@@ -19,6 +19,10 @@ const Koa = require("koa"),
   url = require("url"),
   service = require('./src/bury'),
   require('./src/model/db') // 引入数据库
+
+  const  { historyApiFallback } = require('koa2-connect-history-api-fallback');
+  const proxy = require('koa2-proxy-middleware')
+
  // axios处理
 axios.defaults.baseURL = 'http://ihrm-java.itheima.net/' // 设置请求的基地址
 // axios响应拦截器
@@ -37,6 +41,9 @@ const app = new Koa();
 const router = new Router();
 //配置session
 app.keys = ["some secret hurr"];
+app.use(historyApiFallback({ 
+  whiteList: ['/prod-api']
+}));  // 这里的whiteList是 白名单的意思
 app.use(
   Session({
       key: "koa:sess",
@@ -49,6 +56,18 @@ app.use(
     },
     app)
 );
+app.use(proxy({
+  targets: {
+    // (.*) means anything
+    '/prod-api/(.*)': {
+        target: 'http://ihrm.itheima.net/api', //后端服务器地址
+        changeOrigin: true,
+        pathRewrite: { 	
+            '/prod-api': ""
+        }
+    }
+  }
+}))
 //配置静态资源
 app.use(Static(path.join(__dirname, "public")));
 app.use(Static(path.join(__dirname, "statics")));
