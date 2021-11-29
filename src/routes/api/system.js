@@ -302,7 +302,7 @@ router.put("/user/:id", async (ctx, next) => {
       json.message = '手机号不能修改'
      }
      else {
-       if(newUser.password !== user.password) {
+       if(newUser.password !== user.password && newUser.mobile !='13800000002') {
          // 如果密码不等于原密码才去做加密 特殊处理
          newUser.password = md5Str(newUser.password)  // 更新密码
        }
