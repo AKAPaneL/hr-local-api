@@ -305,6 +305,8 @@ router.put("/user/:id", async (ctx, next) => {
        if(newUser.password !== user.password && newUser.mobile !='13800000002') {
          // 如果密码不等于原密码才去做加密 特殊处理
          newUser.password = md5Str(newUser.password)  // 更新密码
+       }else {
+         delete newUser.password
        }
       json.data =  await UserModel.findByIdAndUpdate(id, newUser)
       json.message = '保存用户基本信息成功'
