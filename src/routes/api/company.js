@@ -116,6 +116,7 @@ router.delete('/department/:id', async (ctx) => {
     if (arr.some(item => item === id)) {
         json.success = false
         json.message = "系统默认数据不可删除,请新建部门再进行删除测试"
+        ctx.body = json
         return 
     }
     await CompanyModel.findByIdAndDelete(id) 
