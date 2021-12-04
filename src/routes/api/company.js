@@ -95,9 +95,30 @@ router.post('/department', async (ctx) => {
  })
  // 新增组织架构
 router.delete('/department/:id', async (ctx) => {
+    const arr = ['604e115c7bfcfa45d019d3e9',
+    '604e21feb205b95968e13129',
+    '604e222bb205b95968e1312a',
+    '604e223fb205b95968e1312b',
+    '604e2251b205b95968e1312c',
+    '604e2262b205b95968e1312d',
+    '604e227db205b95968e1312e',
+    '604e2297b205b95968e1312f',
+    '6051ad90e93db6522c1d00d2',
+    '6051adb6e93db6522c1d00d3',
+    '6051add6e93db6522c1d00d4',
+    '6051adefe93db6522c1d00d5',
+    '6051ae03e93db6522c1d00d6',
+    '6051ae15e93db6522c1d00d7',
+    '6051ae28e93db6522c1d00d8',
+    '6051ae3de93db6522c1d00d9']
     let  json = { ...returnJSON } 
     const id = ctx.params.id
-    await CompanyModel.findByIdAndDelete(id)
+    if (arr.some(item => item === id)) {
+        json.success = false
+        json.message = "系统默认数据不可删除,请新建部门再进行删除测试"
+        return 
+    }
+    await CompanyModel.findByIdAndDelete(id) 
     json.message = "删除部门成功"
     ctx.body = json
  })
