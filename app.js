@@ -23,6 +23,8 @@ const Koa = require("koa"),
   const  { historyApiFallback } = require('koa2-connect-history-api-fallback');
   const proxy = require('koa2-proxy-middleware')
   var process = require('child_process');
+  var APICount = require('./src/model/ApiCount')
+const sd = require('silly-datetime')
  // axios处理
 axios.defaults.baseURL = 'http://ihrm-java.itheima.net/' // 设置请求的基地址
 // axios响应拦截器
@@ -140,6 +142,27 @@ router.post('/api/reset', async (ctx) => {
     }
   })
   ctx.body = { "success": true, "code": 10000, "message": "重置数据成功" }
+
+})
+// 获取访问的数据集合
+router.get('/api_count', async ctx => {
+  // 请求总次数
+  const allCount = await APICount.find().countDocuments() // 总请求次数
+  // 只计算12小时之内的请求数据
+  var currentTime = new Date()
+  var time = new Date(currentTime.setHours(currentTime.getHours() - 1))
+  const result = await APICount.aggregate([{
+    $match: {
+      "create_time": {
+        "$gt": sd.format(time, 'YYYY-MM-DD HH:mm:ss') 
+      }
+    }
+  },{
+    $group: {"_id":'$create_time', 'api_count': { "$sum": 1 } }
+  },{
+    $sort: { "_id": 1 }
+  }])
+  return {allCount, result }
 
 })
 app.use(router.routes())
