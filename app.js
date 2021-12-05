@@ -90,12 +90,17 @@ app.use(
 );
 //全局属性
 app.use(async (ctx, next) => {
-  if (!isBuryStart) {
-    // 只记录第一次埋点
-    isBuryStart = true
-    service.bury(ctx, 'people')
-  }
+
   var pathname = url.parse(ctx.url).pathname;
+  if (pathname !== '/api/api_count') {
+    APICount.create({
+      api_host: ctx.request.header.host,
+      api_method: ctx.request.method,
+      api_url: pathname,
+      api_name: pathname,
+      user_agent: ctx.request.header['user-agent'] || ''
+    })
+  }
    if (pathname === '/api/sys/login' || pathname === '/api/reset') {
       // 如果是登录直接放过
      await next()
@@ -145,7 +150,7 @@ router.post('/api/reset', async (ctx) => {
 
 })
 // 获取访问的数据集合
-router.get('/api_count', async ctx => {
+router.get('/api/api_count', async ctx => {
   // 请求总次数
   const allCount = await APICount.find().countDocuments() // 总请求次数
   // 只计算12小时之内的请求数据
@@ -162,8 +167,9 @@ router.get('/api_count', async ctx => {
   },{
     $sort: { "_id": 1 }
   }])
-  return {allCount, result }
-
+  ctx.body = { "success": true, "code": 10000, "message": "获取分析数据成功", data: {
+    allCount, result
+  }}
 })
 app.use(router.routes())
 //启动路由
