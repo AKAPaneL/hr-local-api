@@ -354,6 +354,18 @@ router.post("/role", async (ctx, next) => {
 router.delete("/role/:id", async (ctx, next) => {
   let  json = { ...returnJSON } 
     const id = ctx.params.id
+    const arr = [
+      '604e2aeb488be61b90b68776',
+      '604e2b03488be61b90b68777',
+      '604e2b12488be61b90b68779',
+      '604e2b19488be61b90b6877a',
+      '604e2b25488be61b90b6877b'
+   ];
+   if(arr.some(item => item === id)) {
+    json.message = "您删除的角色为系统数据-请添加新角色再删除"
+    ctx.body = json
+    return
+   }
     await RoleModel.findByIdAndDelete(id)
     json.message = "删除角色成功"
     ctx.body = json
