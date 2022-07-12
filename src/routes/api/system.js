@@ -363,6 +363,7 @@ router.delete("/role/:id", async (ctx, next) => {
    ];
    if(arr.some(item => item === id)) {
     json.message = "您删除的角色为系统数据-请添加新角色再删除"
+    json.success = false
     ctx.body = json
     return
    }
