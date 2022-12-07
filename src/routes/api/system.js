@@ -127,7 +127,7 @@ router.get("/user", async (ctx) => {
     mobile: item.mobile,
     username: item.username,
     password: item.password,
-    enableState: item.enableState,
+    enableState: item.enableState || false,
     createTime: item.createTime,
     companyId: item.companyId,
     companyName: item.companyName,
